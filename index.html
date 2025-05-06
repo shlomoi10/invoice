@@ -385,12 +385,12 @@
                     <option value="en">English</option>
                 </select>
                 <label for="companyNameInput">שם החברה</label>
-                <input type="text" id="companyNameInput" value="הבחרת שיווק שיער מוברר בע"מ" />
+                <input type="text" id="companyNameInput" value="הנבחרת שיווק שיער מובחר בע"מ" />
                 <label for="companyAddressInput">כתובת החברה</label>
-                <textarea id="companyAddressInput">ע.מ: 516817186
-הרימונים 12 מודיעין עילית 7180112
-טל: 
-פקס: 
+                <textarea id="companyAddressInput">ע.מ:. 516817186
+הריטבא 12 מודיעין עילית7180112
+טל:
+פקס:
 8765hanivcheret@gmail.com</textarea>
                 <label for="toInput">לכבוד</label>
                 <textarea id="toInput" style="white-space:pre-line;"></textarea>
@@ -407,8 +407,8 @@
                 <label for="invoiceTypeSelect">סוג מסמך</label>
                 <select id="invoiceTypeSelect">
                     <option value="חשבונית מס" selected>חשבונית מס</option>
-                    <option value="חשבונית מס/קבלה">חשבונית מס/קבלה</option>
-                    <option value="קבלה">קבלה</option>
+                    <option value="חשבונית מס/קבלה" disabled>חשבונית מס/קבלה (נעול)</option>
+                    <option value="קבלה" disabled>קבלה (נעול)</option>
                 </select>
                 <label for="invoiceNumberMainInput">מספר מסמך</label>
                 <input type="text" id="invoiceNumberMainInput" value="180011" />
@@ -442,12 +442,12 @@
                 <div class="container">
                     <div class="header">
                         <div>
-                            <div class="company-details" id="companyName">הבחרת שיווק שיער מוברר בע"מ</div>
+                            <div class="company-details" id="companyName">הנבחרת שיווק שיער מובחר בע"מ</div>
                             <div class="company-info" id="companyAddress">
-                                ע.מ: 516817186<br>
-                                הרימונים 12 מודיעין עילית 7180112<br>
-                                טל: <br>
-                                פקס: <br>
+                                ע.מ:. 516817186<br>
+                                הריטבא 12 מודיעין עילית7180112<br>
+                                טל:<br>
+                                פקס:<br>
                                 8765hanivcheret@gmail.com
                             </div>
                         </div>
@@ -472,7 +472,7 @@
                         <table style="width:100%; table-layout: fixed;">
                             <thead>
                                 <tr>
-                                    <th style="width:25%">מוצר/שירות</th>
+                                    <th style="width:25%">מוצר</th>
                                     <th class="desc-col" style="width:35%">תיאור</th>
                                     <th style="width:10%">כמות</th>
                                     <th style="width:15%">מחיר</th>
@@ -574,7 +574,7 @@
             vat: 'מע"מ',
             totalPay: 'סה"כ לתשלום',
             dear: 'לכבוד:',
-            productService: 'מוצר/שירות',
+            productService: 'מוצר',
             docTitle: 'חשבונית מס',
             descCol: 'תיאור',
             amount: 'כמות',
@@ -599,7 +599,7 @@
             vat: 'VAT',
             totalPay: 'Total Payable',
             dear: 'Dear:',
-            productService: 'Product/Service',
+            productService: 'Product',
             docTitle: 'Invoice',
             descCol: 'Description',
             amount: 'Amount',
@@ -612,13 +612,13 @@
     const DOC_TYPE_OPTIONS = {
         he: [
             {value: 'חשבונית מס', label: 'חשבונית מס'},
-            {value: 'חשבונית מס/קבלה', label: 'חשבונית מס/קבלה'},
-            {value: 'קבלה', label: 'קבלה'}
+            {value: 'חשבונית מס/קבלה', label: 'חשבונית מס/קבלה (נעול)', disabled: true},
+            {value: 'קבלה', label: 'קבלה (נעול)', disabled: true}
         ],
         en: [
             {value: 'Invoice', label: 'Invoice'},
-            {value: 'Tax Invoice/Receipt', label: 'Tax Invoice/Receipt'},
-            {value: 'Receipt', label: 'Receipt'}
+            {value: 'Tax Invoice/Receipt', label: 'Tax Invoice/Receipt (Locked)', disabled: true},
+            {value: 'Receipt', label: 'Receipt (Locked)', disabled: true}
         ]
     };
 
@@ -643,10 +643,10 @@
     }
 
     companyNameInput.addEventListener('input', function() {
-        companyName.textContent = this.value || 'הבחרת שיווק שיער מוברר בע"מ';
+        companyName.textContent = this.value || 'הנבחרת שיווק שיער מובחר בע"מ';
     });
     companyAddressInput.addEventListener('input', function() {
-        companyAddress.innerHTML = (this.value || 'ע.מ: 516817186<br>הרימונים 12 מודיעין עילית 7180112<br>טל: <br>פקס: <br>8765hanivcheret@gmail.com').replace(/\n/g, '<br>');
+        companyAddress.innerHTML = (this.value || 'ע.מ:. 516817186<br>הריטבא 12 מודיעין עילית7180112<br>טל:<br>פקס:<br>8765hanivcheret@gmail.com').replace(/\n/g, '<br>');
     });
     toInput.addEventListener('input', function() {
         toValue.textContent = this.value;
@@ -698,6 +698,28 @@
         document.body.classList.add(lang === 'he' ? 'lang-he' : 'lang-en');
         document.querySelector('.page-frame').classList.remove('lang-he', 'lang-en');
         document.querySelector('.page-frame').classList.add(lang === 'he' ? 'lang-he' : 'lang-en');
+        
+        // עדכון שם החברה בהתאם לשפה
+        if (lang === 'he') {
+            companyNameInput.value = 'הנבחרת שיווק שיער מובחר בע"מ';
+            companyName.textContent = 'הנבחרת שיווק שיער מובחר בע"מ';
+            companyAddressInput.value = 'ע.מ:. 516817186\nהריטבא 12 מודיעין עילית7180112\nטל:\nפקס:\n8765hanivcheret@gmail.com';
+            companyAddress.innerHTML = 'ע.מ:. 516817186<br>הריטבא 12 מודיעין עילית7180112<br>טל:<br>פקס:<br>8765hanivcheret@gmail.com';
+            productNameInput.value = 'שיער';
+            productNameCell.textContent = 'שיער';
+            productDescInput.value = '4 פאות שיער אדם';
+            productDescCell.textContent = '4 פאות שיער אדם';
+        } else {
+            companyNameInput.value = 'HANIVHERET - PRIME HAIR MARKETING LTD';
+            companyName.textContent = 'HANIVHERET - PRIME HAIR MARKETING LTD';
+            companyAddressInput.value = 'Business ID: 516817186\nHaritba 12 Modiin Illit 7180112\nPhone:\nFax:\n8765hanivcheret@gmail.com';
+            companyAddress.innerHTML = 'Business ID: 516817186<br>Haritba 12 Modiin Illit 7180112<br>Phone:<br>Fax:<br>8765hanivcheret@gmail.com';
+            productNameInput.value = 'HAIR';
+            productNameCell.textContent = 'HAIR';
+            productDescInput.value = '4 Human Hair Wigs';
+            productDescCell.textContent = '4 Human Hair Wigs';
+        }
+        
         // עדכון תוויות
         updateLabels(lang);
     }
@@ -708,13 +730,16 @@
         if (lang === 'he') {
             tableHeadings[0].style.width = '25%'; // מוצר/שירות
             tableHeadings[1].style.width = '35%'; // תיאור
+            tableHeadings[2].style.width = '10%'; // כמות
+            tableHeadings[3].style.width = '15%'; // מחיר
+            tableHeadings[4].style.width = '15%'; // סה"כ
         } else {
-            tableHeadings[0].style.width = '20%'; // Product/Service
-            tableHeadings[1].style.width = '40%'; // Description
+            tableHeadings[0].style.width = '25%'; // Product/Service - הגדלה ב-5%
+            tableHeadings[1].style.width = '36%'; // Description
+            tableHeadings[2].style.width = '10%'; // Amount
+            tableHeadings[3].style.width = '14%'; // Price - הקטנה ב-5%
+            tableHeadings[4].style.width = '15%'; // Total
         }
-        tableHeadings[2].style.width = '10%'; // כמות
-        tableHeadings[3].style.width = '15%'; // מחיר
-        tableHeadings[4].style.width = '15%'; // סה"כ
 
         // פאנל צד
         document.querySelector('label[for="toInput"]').innerText = LABELS[lang].to;
@@ -828,14 +853,19 @@
             var option = document.createElement('option');
             option.value = opt.value;
             option.textContent = opt.label;
+            if (opt.disabled) {
+                option.disabled = true;
+            }
             select.appendChild(option);
         });
         // נסה לשמר בחירה קודמת אם יש התאמה, אחרת בחר ראשון
-        var found = Array.from(select.options).some(o => o.value === currentValue);
+        var found = Array.from(select.options).some(o => o.value === currentValue && !o.disabled);
         if(found) select.value = currentValue;
         else select.selectedIndex = 0;
-        // עדכן כותרת במסמך
-        document.getElementById('invoiceTypeTitle').innerText = select.options[select.selectedIndex].text;
+        // עדכן כותרת במסמך - הסר את הטקסט "(נעול)" מהכותרת
+        var titleText = select.options[select.selectedIndex].text;
+        titleText = titleText.replace(/ \(נעול\)$/, '').replace(/ \(Locked\)$/, '');
+        document.getElementById('invoiceTypeTitle').innerText = titleText;
     }
 
     function updateProductTable() {
