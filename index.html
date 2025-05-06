@@ -4,9 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>invoice</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Rubik', Arial, sans-serif;
             direction: rtl;
             background: #fff;
             margin: 0;
@@ -18,81 +21,138 @@
             right: 0;
             width: 340px;
             height: 100vh;
-            background: linear-gradient(135deg, #f7f7fa 70%, #e3e6f3 100%);
-            padding: 36px 26px 26px 20px;
+            background: linear-gradient(135deg, #f8f9ff 60%, #eef1ff 100%);
+            padding: 30px 26px 100px 20px; /* הגדלת padding בתחתית לאפשר גלילה מלאה */
             z-index: 1000;
             display: flex;
             flex-direction: column;
-            gap: 18px;
+            gap: 16px;
             overflow-y: auto;
-            box-shadow: -4px 0 18px 0 rgba(44, 62, 80, 0.10);
+            overflow-x: hidden;
+            box-shadow: -4px 0 20px 0 rgba(44, 62, 80, 0.12);
             border-top-left-radius: 24px;
             border-bottom-left-radius: 24px;
             border-right: 1.5px solid #cfd8dc;
-            transition: box-shadow 0.3s;
+            transition: all 0.3s ease;
+            scrollbar-width: thin;
+            scrollbar-color: #6366f1 #f0f0f0;
         }
         .side-panel label {
             font-weight: 600;
             color: #374151;
-            margin-bottom: 4px;
+            margin-bottom: 6px;
             margin-top: 4px;
             font-size: 15px;
             letter-spacing: 0.01em;
             display: block;
             transition: color 0.2s;
+            position: relative;
+            padding-right: 2px;
+        }
+        
+        .side-panel label::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            right: 0;
+            width: 20px;
+            height: 2px;
+            background: #6366f1;
+            border-radius: 2px;
+            opacity: 0.7;
         }
         .side-panel input,
         .side-panel textarea,
         .side-panel select {
             width: 100%;
             font-size: 15px;
-            padding: 10px 10px;
-            border-radius: 8px;
+            padding: 12px 14px;
+            border-radius: 10px;
             border: 1.5px solid #d1d5db;
-            background: #f9fafb;
+            background: #ffffff;
             color: #222;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
             margin-top: 2px;
             box-sizing: border-box;
             outline: none;
-            transition: border-color 0.2s, box-shadow 0.2s;
-            box-shadow: 0 1px 3px rgba(44, 62, 80, 0.03);
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 4px rgba(44, 62, 80, 0.03);
             resize: vertical;
+            font-family: 'Rubik', Arial, sans-serif;
         }
         .side-panel input:focus,
         .side-panel textarea:focus,
         .side-panel select:focus {
             border-color: #6366f1;
             background: #fff;
-            box-shadow: 0 2px 8px rgba(99, 102, 241, 0.08);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.12);
+            transform: translateY(-1px);
         }
         .side-panel textarea {
-            min-height: 60px;
+            min-height: 70px;
             max-height: 120px;
+            line-height: 1.5;
         }
         .side-panel .row {
             display: flex;
-            gap: 10px;
+            gap: 12px;
+            margin-bottom: 4px;
         }
         .side-panel .row > * {
             flex: 1;
         }
         .side-panel select {
             cursor: pointer;
-            background: #f3f4f6;
+            background: #f9faff url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="%236366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>') no-repeat;
+            background-position: left 12px center;
+            background-size: 16px;
+            padding-left: 36px;
+            appearance: none;
+            -webkit-appearance: none;
         }
         .side-panel option {
             background: #fff;
             color: #222;
+            padding: 8px;
         }
         .side-panel::-webkit-scrollbar {
-            width: 7px;
-            background: #ececec;
+            width: 8px;
+            background: #f0f0f0;
             border-radius: 10px;
         }
         .side-panel::-webkit-scrollbar-thumb {
-            background: #d1d5db;
+            background: #6366f1;
             border-radius: 10px;
+            opacity: 0.8;
+        }
+        .side-panel::-webkit-scrollbar-thumb:hover {
+            background: #4f46e5;
+        }
+        /* הוספת כפתור חזרה לראש הפאנל */
+        .scroll-top-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 40px;
+            height: 40px;
+            background: #6366f1;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 1010;
+            box-shadow: 0 2px 10px rgba(99, 102, 241, 0.2);
+        }
+        .scroll-top-btn.visible {
+            opacity: 1;
+        }
+        .scroll-top-btn:hover {
+            background: #4f46e5;
         }
         .container {
             width: 900px;
@@ -171,6 +231,12 @@
             margin-top: 25px;
             direction: inherit;
             text-align: inherit;
+        }
+        
+        /* סגנון עבור עמודת כמות מצומצמת */
+        th[style*="width:10%"], td:nth-child(3) {
+            text-align: center;
+            white-space: nowrap;
         }
         table {
             border-collapse: collapse;
@@ -311,7 +377,8 @@
     <button id="pdfBtn" style="position:fixed; top:24px; left:24px; z-index:9999; font-size:18px; padding:8px 18px; background:#222; color:#fff; border:none; border-radius:6px; cursor:pointer;">PDF</button>
     <div class="page-frame lang-he">
         <div style="display: flex;">
-            <div class="side-panel">
+            <div class="side-panel" id="sidePanel">
+                <button class="scroll-top-btn" id="scrollTopBtn" title="חזרה לראש הפאנל" style="display:none;">↑</button>
                 <label for="langSelect">שפה / Language</label>
                 <select id="langSelect">
                     <option value="he" selected>עברית</option>
@@ -368,6 +435,8 @@
                     <option value="USD" selected>USD</option>
                     <option value="ILS">ש"ח</option>
                 </select>
+                <!-- הוספת רווח בתחתית הפאנל לאפשר גלילה מלאה של כל התוכן -->
+                <div style="height: 40px;"></div>
             </div>
             <div style="flex:1; min-width:0;">
                 <div class="container">
@@ -384,8 +453,8 @@
                         </div>
                     </div>
                     <div class="row">
-                        <!-- תיבת Dear קבועה, מיושרת לימין -->
-                        <div style="text-align:right; margin-bottom: 10px; direction: rtl;">
+                        <!-- תיבת Dear שמשנה יישור לפי שפה -->
+                        <div id="toContainer" style="text-align:right; margin-bottom: 10px; direction: rtl;">
                             <span style="font-weight:bold;" id="toLabel"></span><br>
                             <span id="toValue" style="white-space:pre-line;"></span>
                         </div>
@@ -400,14 +469,14 @@
                         <div id="computerizedLabel" style="position:absolute; left:0; top:0; font-size:13px; text-align:left;">מסמך ממוחשב</div>
                     </div>
                     <div class="table-section">
-                        <table style="width:100%;">
+                        <table style="width:100%; table-layout: fixed;">
                             <thead>
                                 <tr>
-                                    <th>מוצר/שירות</th>
-                                    <th class="desc-col">תיאור</th>
-                                    <th>כמות</th>
-                                    <th>מחיר</th>
-                                    <th>סה"כ</th>
+                                    <th style="width:25%">מוצר/שירות</th>
+                                    <th class="desc-col" style="width:35%">תיאור</th>
+                                    <th style="width:10%">כמות</th>
+                                    <th style="width:15%">מחיר</th>
+                                    <th style="width:15%">סה"כ</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -419,39 +488,29 @@
                                     <td id="productTotalCell">2,000.00</td>
                                 </tr>
                                 <tr>
-                                    <td style="border:none;"></td>
-                                    <td style="border:none;"></td>
-                                    <td style="border:none;"></td>
-                                    <td style="text-align:right; border-left:none;" id="labelSumProducts">סכום מוצרים</td>
-                                    <td style="text-align:right; border-right:none;" id="summaryProducts">2,000.00</td>
+                                    <td style="border:none;" colspan="2"></td>
+                                    <td style="text-align:right; border:none;" colspan="2" id="labelSumProducts">סכום מוצרים</td>
+                                    <td style="text-align:right; border:none;" id="summaryProducts">2,000.00</td>
                                 </tr>
                                 <tr>
-                                    <td style="border:none;"></td>
-                                    <td style="border:none;"></td>
-                                    <td style="border:none;"></td>
-                                    <td style="text-align:right; border-left:none;" id="labelDiscount">הנחה (0.00%)</td>
-                                    <td style="text-align:right; border-right:none;" id="summaryDiscount">0.00</td>
+                                    <td style="border:none;" colspan="2"></td>
+                                    <td style="text-align:right; border:none;" colspan="2" id="labelDiscount">הנחה (0.00%)</td>
+                                    <td style="text-align:right; border:none;" id="summaryDiscount">0.00</td>
                                 </tr>
                                 <tr>
-                                    <td style="border:none;"></td>
-                                    <td style="border:none;"></td>
-                                    <td style="border:none;"></td>
-                                    <td style="text-align:right; border-left:none;" id="labelRounding">הנחת עיגול</td>
-                                    <td style="text-align:right; border-right:none;" id="summaryRounding">0.00</td>
+                                    <td style="border:none;" colspan="2"></td>
+                                    <td style="text-align:right; border:none;" colspan="2" id="labelRounding">הנחת עיגול</td>
+                                    <td style="text-align:right; border:none;" id="summaryRounding">0.00</td>
                                 </tr>
                                 <tr>
-                                    <td style="border:none;"></td>
-                                    <td style="border:none;"></td>
-                                    <td style="border:none;"></td>
-                                    <td style="text-align:right; border-left:none;" id="labelVat">מע"מ</td>
-                                    <td style="text-align:right; border-right:none;" id="summaryVat">0.00</td>
+                                    <td style="border:none;" colspan="2"></td>
+                                    <td style="text-align:right; border:none;" colspan="2" id="labelVat">מע"מ</td>
+                                    <td style="text-align:right; border:none;" id="summaryVat">0.00</td>
                                 </tr>
                                 <tr>
-                                    <td style="border:none;"></td>
-                                    <td style="border:none;"></td>
-                                    <td style="border:none;"></td>
-                                    <td style="text-align:right; font-weight:bold; border-left:none;" id="labelTotalPay">סה"כ לתשלום <span id="currencySymbol">(USD)</span></td>
-                                    <td style="text-align:right; font-weight:bold; border-right:none;" id="summaryTotal">2,000.00</td>
+                                    <td style="border:none;" colspan="2"></td>
+                                    <td style="text-align:right; font-weight:bold; border:none;" colspan="2" id="labelTotalPay">סה"כ לתשלום <span id="currencySymbol">(USD)</span></td>
+                                    <td style="text-align:right; font-weight:bold; border:none;" id="summaryTotal">2,000.00</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -591,6 +650,16 @@
     });
     toInput.addEventListener('input', function() {
         toValue.textContent = this.value;
+        // וידוא שהיישור מתעדכן גם בעת הזנת טקסט
+        const currentLang = document.documentElement.lang;
+        const toContainer = document.getElementById('toContainer');
+        if (currentLang === 'he') {
+            toContainer.style.textAlign = 'right';
+            toContainer.style.direction = 'rtl';
+        } else {
+            toContainer.style.textAlign = 'left';
+            toContainer.style.direction = 'ltr';
+        }
     });
     invoiceTimeInput.addEventListener('input', updateDateTime);
     invoiceDateInput.addEventListener('input', updateDateTime);
@@ -634,6 +703,19 @@
     }
 
     function updateLabels(lang) {
+        // עדכון רוחב העמודות בהתאם לשפה
+        const tableHeadings = document.querySelectorAll('th');
+        if (lang === 'he') {
+            tableHeadings[0].style.width = '25%'; // מוצר/שירות
+            tableHeadings[1].style.width = '35%'; // תיאור
+        } else {
+            tableHeadings[0].style.width = '20%'; // Product/Service
+            tableHeadings[1].style.width = '40%'; // Description
+        }
+        tableHeadings[2].style.width = '10%'; // כמות
+        tableHeadings[3].style.width = '15%'; // מחיר
+        tableHeadings[4].style.width = '15%'; // סה"כ
+
         // פאנל צד
         document.querySelector('label[for="toInput"]').innerText = LABELS[lang].to;
         document.querySelector('label[for="invoiceTimeInput"]').innerText = LABELS[lang].time;
@@ -645,6 +727,19 @@
         document.querySelector('label[for="productQtyInput"]').innerText = LABELS[lang].qty;
         document.querySelector('label[for="productPriceInput"]').innerText = LABELS[lang].price;
         document.querySelector('label[for="productTotalInput"]').innerText = LABELS[lang].total;
+        
+        // עדכון יישור וכיוון של שדה "לכבוד" לפי השפה
+        const toContainer = document.getElementById('toContainer');
+        if (lang === 'he') {
+            toContainer.style.textAlign = 'right';
+            toContainer.style.direction = 'rtl';
+        } else {
+            toContainer.style.textAlign = 'left';
+            toContainer.style.direction = 'ltr';
+        }
+        
+        // עדכון תווית "לכבוד"
+        document.getElementById('toLabel').innerText = LABELS[lang].dear;
 
         // טבלה ראשית
         document.querySelectorAll('th')[0].innerText = LABELS[lang].productService;
@@ -653,13 +748,18 @@
         document.querySelectorAll('th')[3].innerText = LABELS[lang].price;
         document.querySelectorAll('th')[4].innerText = LABELS[lang].total;
 
-        // שורות סיכום
-        const summaryRows = document.querySelectorAll('tbody tr');
-        summaryRows[0].children[3].innerText = LABELS[lang].sumProducts;
-        summaryRows[1].children[3].innerText = LABELS[lang].discount;
-        summaryRows[2].children[3].innerText = LABELS[lang].rounding;
-        summaryRows[3].children[3].innerText = LABELS[lang].vat;
+        // שורות סיכום - עדכון למבנה החדש של הטבלה
+        document.getElementById('labelSumProducts').innerText = LABELS[lang].sumProducts;
+        document.getElementById('labelDiscount').innerText = LABELS[lang].discount;
+        document.getElementById('labelRounding').innerText = LABELS[lang].rounding;
+        document.getElementById('labelVat').innerText = LABELS[lang].vat;
         document.getElementById('labelTotalPay').innerHTML = LABELS[lang].totalPay + ' <span id="currencySymbol">(' + LABELS[lang].currency + ')</span>';
+        
+        // עדכון יישור טקסט בשורות הסיכום לפי שפה
+        const summaryLabels = document.querySelectorAll('#labelSumProducts, #labelDiscount, #labelRounding, #labelVat, #labelTotalPay');
+        for (let el of summaryLabels) {
+            el.style.textAlign = lang === 'he' ? 'right' : 'left';
+        }
 
         // לכבוד
         var toLabel = document.getElementById('toLabel');
@@ -702,32 +802,21 @@
     }
 
     function updateSummaryBorders(lang) {
-        var ids = ['summaryProducts', 'summaryDiscount', 'summaryRounding', 'summaryVat', 'summaryTotal'];
-        ids.forEach(function(id) {
-            var el = document.getElementById(id);
-            if(!el) return;
-            if(lang === 'he') {
-                el.style.borderRight = 'none';
-                el.style.borderLeft = '';
-            } else {
-                el.style.borderLeft = 'none';
-                el.style.borderRight = '';
-            }
-        });
+        // עדכון יישור טקסט לפי שפה (ללא שוליים פנימיים)
+        const summaryValues = document.querySelectorAll('#summaryProducts, #summaryDiscount, #summaryRounding, #summaryVat, #summaryTotal');
+        for (let el of summaryValues) {
+            el.style.textAlign = lang === 'he' ? 'right' : 'left';
+        }
     }
 
     function updateSummaryLabelBorders(lang) {
+        // במבנה החדש אין שוליים פנימיים, אז אין צורך לעדכן אותם
+        // אבל כן צריך לעדכן את יישור הטקסט
         var ids = ['labelDiscount', 'labelSumProducts', 'labelRounding', 'labelVat', 'labelTotalPay'];
         ids.forEach(function(id) {
             var el = document.getElementById(id);
             if(!el) return;
-            if(lang === 'he') {
-                el.style.borderLeft = 'none';
-                el.style.borderRight = '';
-            } else {
-                el.style.borderRight = 'none';
-                el.style.borderLeft = '';
-            }
+            el.style.textAlign = lang === 'he' ? 'right' : 'left';
         });
     }
 
@@ -761,6 +850,31 @@
         summaryTotal.textContent = formatNumber(total);
     }
 
+    // פונקציונליות לכפתור חזרה לראש הפאנל
+    const scrollTopBtn = document.getElementById('scrollTopBtn');
+    const sidePanel = document.getElementById('sidePanel');
+    
+    sidePanel.addEventListener('scroll', function() {
+        if (sidePanel.scrollTop > 300) {
+            scrollTopBtn.style.display = 'flex';
+            scrollTopBtn.classList.add('visible');
+        } else {
+            scrollTopBtn.classList.remove('visible');
+            setTimeout(() => {
+                if (!scrollTopBtn.classList.contains('visible')) {
+                    scrollTopBtn.style.display = 'none';
+                }
+            }, 300);
+        }
+    });
+    
+    scrollTopBtn.addEventListener('click', function() {
+        sidePanel.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    });
+    
     // ברירת מחדל - עדכון ראשוני
     window.addEventListener('DOMContentLoaded', function() {
         const now = new Date();
