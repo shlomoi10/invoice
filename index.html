@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>invoice</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            direction: rtl;
+            background: #fff;
+            margin: 0;
+            padding: 0;
+        }
+        .side-panel {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 340px;
+            height: 100vh;
+            background: linear-gradient(135deg, #f7f7fa 70%, #e3e6f3 100%);
+            padding: 36px 26px 26px 20px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            overflow-y: auto;
+            box-shadow: -4px 0 18px 0 rgba(44, 62, 80, 0.10);
+            border-top-left-radius: 24px;
+            border-bottom-left-radius: 24px;
+            border-right: 1.5px solid #cfd8dc;
+            transition: box-shadow 0.3s;
+        }
+        .side-panel label {
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 4px;
+            margin-top: 4px;
+            font-size: 15px;
+            letter-spacing: 0.01em;
+            display: block;
+            transition: color 0.2s;
+        }
+        .side-panel input,
+        .side-panel textarea,
+        .side-panel select {
+            width: 100%;
+            font-size: 15px;
+            padding: 10px 10px;
+            border-radius: 8px;
+            border: 1.5px solid #d1d5db;
+            background: #f9fafb;
+            color: #222;
+            margin-bottom: 10px;
+            margin-top: 2px;
+            box-sizing: border-box;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            box-shadow: 0 1px 3px rgba(44, 62, 80, 0.03);
+            resize: vertical;
+        }
+        .side-panel input:focus,
+        .side-panel textarea:focus,
+        .side-panel select:focus {
+            border-color: #6366f1;
+            background: #fff;
+            box-shadow: 0 2px 8px rgba(99, 102, 241, 0.08);
+        }
+        .side-panel textarea {
+            min-height: 60px;
+            max-height: 120px;
+        }
+        .side-panel .row {
+            display: flex;
+            gap: 10px;
+        }
+        .side-panel .row > * {
+            flex: 1;
+        }
+        .side-panel select {
+            cursor: pointer;
+            background: #f3f4f6;
+        }
+        .side-panel option {
+            background: #fff;
+            color: #222;
+        }
+        .side-panel::-webkit-scrollbar {
+            width: 7px;
+            background: #ececec;
+            border-radius: 10px;
+        }
+        .side-panel::-webkit-scrollbar-thumb {
+            background: #d1d5db;
+            border-radius: 10px;
+        }
+        .container {
+            width: 900px;
+            margin: 0 auto;
+            padding: 30px 40px 20px 40px;
+            background: #fff;
+            direction: inherit;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            direction: inherit;
+            text-align: inherit;
+        }
+        .company-details {
+            text-align: right;
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 8px;
+            direction: inherit;
+            text-align: inherit;
+        }
+        .company-info {
+            text-align: right;
+            font-size: 14px;
+            font-weight: normal;
+            margin-bottom: 8px;
+            direction: inherit;
+            text-align: inherit;
+        }
+        .divider {
+            border-top: 1px solid #ccc;
+            margin: 24px 0 12px 0;
+        }
+        .row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+        .details-block {
+            min-width: 320px;
+            font-size: 14px;
+            line-height: 1.7;
+        }
+        .details-block.left {
+            text-align: right;
+        }
+        .details-block.right {
+            text-align: left;
+            width: 100%;
+            padding-left: 0;
+        }
+        .invoice-title {
+            font-size: 28px;
+            font-weight: bold;
+            margin: 30px 0 0 0;
+            direction: inherit;
+            /* נשאר תמיד במרכז */
+            text-align: center !important;
+        }
+        .invoice-number {
+            text-align: center;
+        }
+        .centered, .lang-he .centered, .lang-en .centered {
+            text-align: center !important;
+        }
+        /* שמירה על מרכזיות גם בשינוי שפה */
+        .lang-he .invoice-title, .lang-en .invoice-title {
+            text-align: center !important;
+        }
+        .lang-he .invoice-number, .lang-en .invoice-number {
+            text-align: center !important;
+        }
+        .table-section {
+            margin-top: 25px;
+            direction: inherit;
+            text-align: inherit;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-bottom: 0;
+            direction: inherit;
+            text-align: inherit;
+        }
+        th, td {
+            border: 1px solid #bdbdbd;
+            padding: 8px 6px;
+            text-align: center;
+            font-size: 15px;
+            direction: inherit;
+            text-align: inherit;
+        }
+        th {
+            background: #f5f5f5;
+            font-weight: bold;
+        }
+        .desc-col {
+            text-align: right;
+        }
+        .summary-table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-top: 0;
+            font-size: 15px;
+        }
+        .summary-table td {
+            border: 1px solid #bdbdbd;
+            padding: 6px 6px;
+            text-align: right;
+        }
+        .summary-table .label {
+            width: 200px;
+            background: #fff;
+            font-weight: normal;
+        }
+        .summary-table .sum {
+            font-weight: bold;
+            background: #f5f5f5;
+        }
+        .page-frame {
+            box-sizing: border-box;
+            width: 210mm;
+            max-width: 210mm;
+            min-height: 297mm;
+            margin: 0 auto;
+            background: #fff;
+            padding: 12mm 10mm 12mm 10mm;
+            position: relative;
+            overflow: hidden;
+            direction: inherit;
+            text-align: inherit;
+        }
+        .lang-he {
+            direction: rtl;
+        }
+        .lang-en {
+            direction: ltr;
+        }
+        .lang-he .header, .lang-he .company-details, .lang-he .company-info, .lang-he .invoice-title, .lang-he .table-section, .lang-he table, .lang-he th, .lang-he td {
+            text-align: right;
+        }
+        .lang-en .header, .lang-en .company-details, .lang-en .company-info, .lang-en .invoice-title, .lang-en .table-section, .lang-en table, .lang-en th, .lang-en td {
+            text-align: left;
+        }
+        .lang-en .table-section table {
+            direction: ltr;
+        }
+        .lang-he .table-section table {
+            direction: rtl;
+        }
+        @media print {
+            html, body {
+                width: 210mm;
+                height: 297mm;
+                margin: 0 !important;
+                padding: 0 !important;
+                background: #fff !important;
+                box-sizing: border-box;
+            }
+            .side-panel, #pdfBtn { display: none !important; }
+            .page-frame {
+                width: 210mm !important;
+                max-width: 210mm !important;
+                min-height: 297mm !important;
+                height: 297mm !important;
+                margin: 0 auto !important;
+                padding: 12mm 10mm 12mm 10mm !important;
+                overflow: hidden !important;
+            }
+        }
+        .container, .header, .table-section, table {
+            max-width: 100%;
+            box-sizing: border-box;
+            overflow-x: auto;
+        }
+        table {
+            table-layout: fixed;
+            word-break: break-word;
+        }
+        /* שורת השעה – יישור משתנה לפי שפה */
+        .invoice-time-row {
+            font-size:14px;
+            margin-bottom: 6px;
+            text-align: left;
+            direction: ltr;
+        }
+        .lang-he .invoice-time-row {
+            text-align: left;
+            direction: ltr;
+        }
+        .lang-en .invoice-time-row {
+            text-align: right;
+            direction: rtl;
+        }
+        /* כפתור PDF שיראה מודרני */
+        #pdfBtn {
+            background: linear-gradient(90deg, #6366f1 60%, #818cf8 100%);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 18px;
+            padding: 10px 24px;
+            box-shadow: 0 2px 8px rgba(99, 102, 241, 0.12);
+            transition: background 0.2s, box-shadow 0.2s;
+        }
+        #pdfBtn:hover {
+            background: linear-gradient(90deg, #4f46e5 60%, #6366f1 100%);
+            box-shadow: 0 4px 14px rgba(99, 102, 241, 0.18);
+        }
+    </style>
+</head>
+<body style="background:#f5f5f5;" class="lang-he">
+    <button id="pdfBtn" style="position:fixed; top:24px; left:24px; z-index:9999; font-size:18px; padding:8px 18px; background:#222; color:#fff; border:none; border-radius:6px; cursor:pointer;">PDF</button>
+    <div class="page-frame lang-he">
+        <div style="display: flex;">
+            <div class="side-panel">
+                <label for="langSelect">שפה / Language</label>
+                <select id="langSelect">
+                    <option value="he" selected>עברית</option>
+                    <option value="en">English</option>
+                </select>
+                <label for="companyNameInput">שם החברה</label>
+                <input type="text" id="companyNameInput" value="הבחרת שיווק שיער מוברר בע"מ" />
+                <label for="companyAddressInput">כתובת החברה</label>
+                <textarea id="companyAddressInput">ע.מ: 516817186
+הרימונים 12 מודיעין עילית 7180112
+טל: 
+פקס: 
+8765hanivcheret@gmail.com</textarea>
+                <label for="toInput">לכבוד</label>
+                <textarea id="toInput" style="white-space:pre-line;"></textarea>
+                <div class="row">
+                    <div>
+                        <label for="invoiceTimeInput">שעה</label>
+                        <input type="time" id="invoiceTimeInput" value="" />
+                    </div>
+                    <div>
+                        <label for="invoiceDateInput">תאריך</label>
+                        <input type="date" id="invoiceDateInput" value="" />
+                    </div>
+                </div>
+                <label for="invoiceTypeSelect">סוג מסמך</label>
+                <select id="invoiceTypeSelect">
+                    <option value="חשבונית מס" selected>חשבונית מס</option>
+                    <option value="חשבונית מס/קבלה">חשבונית מס/קבלה</option>
+                    <option value="קבלה">קבלה</option>
+                </select>
+                <label for="invoiceNumberMainInput">מספר מסמך</label>
+                <input type="text" id="invoiceNumberMainInput" value="180011" />
+                <label for="productNameInput">שם המוצר</label>
+                <input type="text" id="productNameInput" value="שיער" />
+                <label for="productDescInput">תיאור</label>
+                <input type="text" id="productDescInput" value="4 פאות שיער אדם" />
+                <div class="row">
+                    <div>
+                        <label for="productQtyInput">כמות</label>
+                        <input type="number" id="productQtyInput" value="1.00" min="0" step="0.01" />
+                    </div>
+                    <div>
+                        <label for="productPriceInput">מחיר</label>
+                        <input type="number" id="productPriceInput" value="2000.00" min="0" step="0.01" />
+                    </div>
+                    <div>
+                        <label for="productTotalInput">סה"כ</label>
+                        <input type="number" id="productTotalInput" value="2000.00" min="0" step="0.01" />
+                    </div>
+                </div>
+                <label for="currencySelect">מטבע</label>
+                <select id="currencySelect">
+                    <option value="USD" selected>USD</option>
+                    <option value="ILS">ש"ח</option>
+                </select>
+            </div>
+            <div style="flex:1; min-width:0;">
+                <div class="container">
+                    <div class="header">
+                        <div>
+                            <div class="company-details" id="companyName">הבחרת שיווק שיער מוברר בע"מ</div>
+                            <div class="company-info" id="companyAddress">
+                                ע.מ: 516817186<br>
+                                הרימונים 12 מודיעין עילית 7180112<br>
+                                טל: <br>
+                                פקס: <br>
+                                8765hanivcheret@gmail.com
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <!-- תיבת Dear קבועה, מיושרת לימין -->
+                        <div style="text-align:right; margin-bottom: 10px; direction: rtl;">
+                            <span style="font-weight:bold;" id="toLabel"></span><br>
+                            <span id="toValue" style="white-space:pre-line;"></span>
+                        </div>
+                    </div>
+                    <!-- החזרת תצוגת תאריך ושעה למסמך -->
+                    <div class="invoice-time-row" style="font-size:14px; margin-bottom: 6px; text-align:left; direction:ltr;">
+                        <span id="invoiceTimeValue"></span>
+                    </div>
+                    <div class="invoice-title" style="margin-bottom: 4px;"><span id="invoiceTypeTitle">invoice</span> <span class="invoice-number" id="invoiceNumberMain">180011</span></div>
+                    <div style="position: relative; margin-bottom: 10px;">
+                        <div id="originLabel" style="text-align:center; font-size:13px;">מקור</div>
+                        <div id="computerizedLabel" style="position:absolute; left:0; top:0; font-size:13px; text-align:left;">מסמך ממוחשב</div>
+                    </div>
+                    <div class="table-section">
+                        <table style="width:100%;">
+                            <thead>
+                                <tr>
+                                    <th>מוצר/שירות</th>
+                                    <th class="desc-col">תיאור</th>
+                                    <th>כמות</th>
+                                    <th>מחיר</th>
+                                    <th>סה"כ</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td id="productNameCell">שיער</td>
+                                    <td class="desc-col" id="productDescCell">4 פאות שיער אדם</td>
+                                    <td id="productQtyCell">1.00</td>
+                                    <td id="productPriceCell">2,000.00</td>
+                                    <td id="productTotalCell">2,000.00</td>
+                                </tr>
+                                <tr>
+                                    <td style="border:none;"></td>
+                                    <td style="border:none;"></td>
+                                    <td style="border:none;"></td>
+                                    <td style="text-align:right; border-left:none;" id="labelSumProducts">סכום מוצרים</td>
+                                    <td style="text-align:right; border-right:none;" id="summaryProducts">2,000.00</td>
+                                </tr>
+                                <tr>
+                                    <td style="border:none;"></td>
+                                    <td style="border:none;"></td>
+                                    <td style="border:none;"></td>
+                                    <td style="text-align:right; border-left:none;" id="labelDiscount">הנחה (0.00%)</td>
+                                    <td style="text-align:right; border-right:none;" id="summaryDiscount">0.00</td>
+                                </tr>
+                                <tr>
+                                    <td style="border:none;"></td>
+                                    <td style="border:none;"></td>
+                                    <td style="border:none;"></td>
+                                    <td style="text-align:right; border-left:none;" id="labelRounding">הנחת עיגול</td>
+                                    <td style="text-align:right; border-right:none;" id="summaryRounding">0.00</td>
+                                </tr>
+                                <tr>
+                                    <td style="border:none;"></td>
+                                    <td style="border:none;"></td>
+                                    <td style="border:none;"></td>
+                                    <td style="text-align:right; border-left:none;" id="labelVat">מע"מ</td>
+                                    <td style="text-align:right; border-right:none;" id="summaryVat">0.00</td>
+                                </tr>
+                                <tr>
+                                    <td style="border:none;"></td>
+                                    <td style="border:none;"></td>
+                                    <td style="border:none;"></td>
+                                    <td style="text-align:right; font-weight:bold; border-left:none;" id="labelTotalPay">סה"כ לתשלום <span id="currencySymbol">(USD)</span></td>
+                                    <td style="text-align:right; font-weight:bold; border-right:none;" id="summaryTotal">2,000.00</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+    // RTL panel - update all invoice fields in real time
+    const companyNameInput = document.getElementById('companyNameInput');
+    const companyAddressInput = document.getElementById('companyAddressInput');
+    const toInput = document.getElementById('toInput');
+    const invoiceTimeInput = document.getElementById('invoiceTimeInput');
+    const invoiceDateInput = document.getElementById('invoiceDateInput');
+    const productNameInput = document.getElementById('productNameInput');
+    const productDescInput = document.getElementById('productDescInput');
+    const productQtyInput = document.getElementById('productQtyInput');
+    const productPriceInput = document.getElementById('productPriceInput');
+    const productTotalInput = document.getElementById('productTotalInput');
+    const currencySelect = document.getElementById('currencySelect');
+    const invoiceTypeSelect = document.getElementById('invoiceTypeSelect');
+    const invoiceTypeTitle = document.getElementById('invoiceTypeTitle');
+    const invoiceNumberMainInput = document.getElementById('invoiceNumberMainInput');
+    const invoiceNumberMain = document.getElementById('invoiceNumberMain');
+
+    const companyName = document.getElementById('companyName');
+    const companyAddress = document.getElementById('companyAddress');
+    const toValue = document.getElementById('toValue');
+    const invoiceTimeValue = document.getElementById('invoiceTimeValue');
+    const productNameCell = document.getElementById('productNameCell');
+    const productDescCell = document.getElementById('productDescCell');
+    const productQtyCell = document.getElementById('productQtyCell');
+    const productPriceCell = document.getElementById('productPriceCell');
+    const productTotalCell = document.getElementById('productTotalCell');
+    const summaryProducts = document.getElementById('summaryProducts');
+    const summaryDiscount = document.getElementById('summaryDiscount');
+    const summaryRounding = document.getElementById('summaryRounding');
+    const summaryVat = document.getElementById('summaryVat');
+    const summaryTotal = document.getElementById('summaryTotal');
+    const currencySymbol = document.getElementById('currencySymbol');
+
+    const langSelect = document.getElementById('langSelect');
+
+    // שמירת טקסטים לשתי שפות
+    const LABELS = {
+        he: {
+            to: 'לכבוד',
+            time: 'שעה',
+            date: 'תאריך',
+            docType: 'סוג מסמך',
+            docNum: 'מספר מסמך',
+            productName: 'שם המוצר',
+            desc: 'תיאור',
+            qty: 'כמות',
+            price: 'מחיר',
+            total: 'סה\'כ',
+            sumProducts: 'סכום מוצרים',
+            discount: 'הנחה (0.00%)',
+            rounding: 'הנחת עיגול',
+            vat: 'מע"מ',
+            totalPay: 'סה"כ לתשלום',
+            dear: 'לכבוד:',
+            productService: 'מוצר/שירות',
+            docTitle: 'חשבונית מס',
+            descCol: 'תיאור',
+            amount: 'כמות',
+            currency: 'ש"ח',
+            origin: 'מקור',
+            computerized: 'מסמך ממוחשב',
+        },
+        en: {
+            to: 'Dear',
+            time: 'Time',
+            date: 'Date',
+            docType: 'Document Type',
+            docNum: 'Document Number',
+            productName: 'Product Name',
+            desc: 'Description',
+            qty: 'Amount',
+            price: 'Price',
+            total: 'Total',
+            sumProducts: 'Sum of Products',
+            discount: 'Discount (0.00%)',
+            rounding: 'Rounding',
+            vat: 'VAT',
+            totalPay: 'Total Payable',
+            dear: 'Dear:',
+            productService: 'Product/Service',
+            docTitle: 'Invoice',
+            descCol: 'Description',
+            amount: 'Amount',
+            currency: 'USD',
+            origin: 'Original',
+            computerized: 'Computerized Document',
+        }
+    };
+
+    const DOC_TYPE_OPTIONS = {
+        he: [
+            {value: 'חשבונית מס', label: 'חשבונית מס'},
+            {value: 'חשבונית מס/קבלה', label: 'חשבונית מס/קבלה'},
+            {value: 'קבלה', label: 'קבלה'}
+        ],
+        en: [
+            {value: 'Invoice', label: 'Invoice'},
+            {value: 'Tax Invoice/Receipt', label: 'Tax Invoice/Receipt'},
+            {value: 'Receipt', label: 'Receipt'}
+        ]
+    };
+
+    function formatNumber(n) {
+        return Number(n).toLocaleString('he-IL', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+    }
+
+    function formatDateTime(dateStr, timeStr) {
+        // dateStr: yyyy-mm-dd, timeStr: hh:mm
+        if (!dateStr && !timeStr) return '';
+        let formatted = '';
+        if (timeStr) formatted += timeStr;
+        if (dateStr) {
+            const [y, m, d] = dateStr.split('-');
+            formatted += (formatted ? ' ' : '') + `${d}/${m}/${y}`;
+        }
+        return formatted;
+    }
+
+    function updateDateTime() {
+        invoiceTimeValue.textContent = formatDateTime(invoiceDateInput.value, invoiceTimeInput.value);
+    }
+
+    companyNameInput.addEventListener('input', function() {
+        companyName.textContent = this.value || 'הבחרת שיווק שיער מוברר בע"מ';
+    });
+    companyAddressInput.addEventListener('input', function() {
+        companyAddress.innerHTML = (this.value || 'ע.מ: 516817186<br>הרימונים 12 מודיעין עילית 7180112<br>טל: <br>פקס: <br>8765hanivcheret@gmail.com').replace(/\n/g, '<br>');
+    });
+    toInput.addEventListener('input', function() {
+        toValue.textContent = this.value;
+    });
+    invoiceTimeInput.addEventListener('input', updateDateTime);
+    invoiceDateInput.addEventListener('input', updateDateTime);
+    productNameInput.addEventListener('input', function() {
+        productNameCell.textContent = this.value;
+    });
+    productDescInput.addEventListener('input', function() {
+        productDescCell.textContent = this.value;
+    });
+    productQtyInput.addEventListener('input', updateProductTable);
+    productPriceInput.addEventListener('input', updateProductTable);
+    productTotalInput.addEventListener('input', function() {
+        productTotalCell.textContent = formatNumber(this.value);
+        summaryProducts.textContent = formatNumber(this.value);
+        summaryTotal.textContent = formatNumber(this.value);
+    });
+    currencySelect.addEventListener('change', function() {
+        currencySymbol.textContent = this.value === 'USD' ? '(USD)' : '(ש"ח)';
+    });
+    invoiceTypeSelect.addEventListener('change', function() {
+        invoiceTypeTitle.textContent = this.value;
+    });
+    invoiceNumberMainInput.addEventListener('input', function() {
+        invoiceNumberMain.textContent = this.value;
+    });
+
+    langSelect.addEventListener('change', function() {
+        setLanguage(langSelect.value);
+    });
+
+    function setLanguage(lang) {
+        // עדכון direction ושפה על האלמנטים הראשיים
+        document.documentElement.lang = lang;
+        document.documentElement.dir = lang === 'he' ? 'rtl' : 'ltr';
+        document.body.classList.remove('lang-he', 'lang-en');
+        document.body.classList.add(lang === 'he' ? 'lang-he' : 'lang-en');
+        document.querySelector('.page-frame').classList.remove('lang-he', 'lang-en');
+        document.querySelector('.page-frame').classList.add(lang === 'he' ? 'lang-he' : 'lang-en');
+        // עדכון תוויות
+        updateLabels(lang);
+    }
+
+    function updateLabels(lang) {
+        // פאנל צד
+        document.querySelector('label[for="toInput"]').innerText = LABELS[lang].to;
+        document.querySelector('label[for="invoiceTimeInput"]').innerText = LABELS[lang].time;
+        document.querySelector('label[for="invoiceDateInput"]').innerText = LABELS[lang].date;
+        document.querySelector('label[for="invoiceTypeSelect"]').innerText = LABELS[lang].docType;
+        document.querySelector('label[for="invoiceNumberMainInput"]').innerText = LABELS[lang].docNum;
+        document.querySelector('label[for="productNameInput"]').innerText = LABELS[lang].productName;
+        document.querySelector('label[for="productDescInput"]').innerText = LABELS[lang].desc;
+        document.querySelector('label[for="productQtyInput"]').innerText = LABELS[lang].qty;
+        document.querySelector('label[for="productPriceInput"]').innerText = LABELS[lang].price;
+        document.querySelector('label[for="productTotalInput"]').innerText = LABELS[lang].total;
+
+        // טבלה ראשית
+        document.querySelectorAll('th')[0].innerText = LABELS[lang].productService;
+        document.querySelectorAll('th')[1].innerText = LABELS[lang].descCol;
+        document.querySelectorAll('th')[2].innerText = LABELS[lang].amount;
+        document.querySelectorAll('th')[3].innerText = LABELS[lang].price;
+        document.querySelectorAll('th')[4].innerText = LABELS[lang].total;
+
+        // שורות סיכום
+        const summaryRows = document.querySelectorAll('tbody tr');
+        summaryRows[0].children[3].innerText = LABELS[lang].sumProducts;
+        summaryRows[1].children[3].innerText = LABELS[lang].discount;
+        summaryRows[2].children[3].innerText = LABELS[lang].rounding;
+        summaryRows[3].children[3].innerText = LABELS[lang].vat;
+        document.getElementById('labelTotalPay').innerHTML = LABELS[lang].totalPay + ' <span id="currencySymbol">(' + LABELS[lang].currency + ')</span>';
+
+        // לכבוד
+        var toLabel = document.getElementById('toLabel');
+        if(lang === 'he') {
+            toLabel.innerHTML = '<span dir="rtl">לכבוד:</span>';
+        } else {
+            toLabel.innerHTML = '<span dir="ltr">Dear:</span>';
+        }
+        // כותרת מסמך
+        document.getElementById('invoiceTypeTitle').innerText = LABELS[lang].docTitle;
+        // תיאור מטבע
+        document.getElementById('currencySymbol').innerText = '(' + LABELS[lang].currency + ')';
+        // מקור ומסמך ממוחשב
+        document.getElementById('originLabel').innerText = LABELS[lang].origin;
+        var computerizedLabel = document.getElementById('computerizedLabel');
+        computerizedLabel.innerText = LABELS[lang].computerized;
+        if(lang === 'he') {
+            computerizedLabel.style.left = '0';
+            computerizedLabel.style.right = '';
+            computerizedLabel.style.textAlign = 'left';
+        } else {
+            computerizedLabel.style.right = '0';
+            computerizedLabel.style.left = '';
+            computerizedLabel.style.textAlign = 'right';
+        }
+        // כיוון שורת השעה
+        var timeRow = document.querySelector('.invoice-time-row');
+        if(timeRow) {
+          if(lang === 'he') {
+            timeRow.style.textAlign = 'left';
+            timeRow.style.direction = 'ltr';
+          } else {
+            timeRow.style.textAlign = 'right';
+            timeRow.style.direction = 'rtl';
+          }
+        }
+        updateSummaryBorders(lang);
+        updateSummaryLabelBorders(lang);
+        updateDocTypeOptions(lang);
+    }
+
+    function updateSummaryBorders(lang) {
+        var ids = ['summaryProducts', 'summaryDiscount', 'summaryRounding', 'summaryVat', 'summaryTotal'];
+        ids.forEach(function(id) {
+            var el = document.getElementById(id);
+            if(!el) return;
+            if(lang === 'he') {
+                el.style.borderRight = 'none';
+                el.style.borderLeft = '';
+            } else {
+                el.style.borderLeft = 'none';
+                el.style.borderRight = '';
+            }
+        });
+    }
+
+    function updateSummaryLabelBorders(lang) {
+        var ids = ['labelDiscount', 'labelSumProducts', 'labelRounding', 'labelVat', 'labelTotalPay'];
+        ids.forEach(function(id) {
+            var el = document.getElementById(id);
+            if(!el) return;
+            if(lang === 'he') {
+                el.style.borderLeft = 'none';
+                el.style.borderRight = '';
+            } else {
+                el.style.borderRight = 'none';
+                el.style.borderLeft = '';
+            }
+        });
+    }
+
+    function updateDocTypeOptions(lang) {
+        var select = document.getElementById('invoiceTypeSelect');
+        var currentValue = select.value;
+        select.innerHTML = '';
+        DOC_TYPE_OPTIONS[lang].forEach(function(opt) {
+            var option = document.createElement('option');
+            option.value = opt.value;
+            option.textContent = opt.label;
+            select.appendChild(option);
+        });
+        // נסה לשמר בחירה קודמת אם יש התאמה, אחרת בחר ראשון
+        var found = Array.from(select.options).some(o => o.value === currentValue);
+        if(found) select.value = currentValue;
+        else select.selectedIndex = 0;
+        // עדכן כותרת במסמך
+        document.getElementById('invoiceTypeTitle').innerText = select.options[select.selectedIndex].text;
+    }
+
+    function updateProductTable() {
+        const qty = parseFloat(productQtyInput.value) || 0;
+        const price = parseFloat(productPriceInput.value) || 0;
+        const total = qty * price;
+        productQtyCell.textContent = formatNumber(qty);
+        productPriceCell.textContent = formatNumber(price);
+        productTotalCell.textContent = formatNumber(total);
+        productTotalInput.value = total;
+        summaryProducts.textContent = formatNumber(total);
+        summaryTotal.textContent = formatNumber(total);
+    }
+
+    // ברירת מחדל - עדכון ראשוני
+    window.addEventListener('DOMContentLoaded', function() {
+        const now = new Date();
+        invoiceTimeInput.value = now.toTimeString().slice(0,5);
+        invoiceDateInput.value = now.toISOString().slice(0,10);
+        updateDateTime();
+        companyNameInput.dispatchEvent(new Event('input'));
+        companyAddressInput.dispatchEvent(new Event('input'));
+        toInput.dispatchEvent(new Event('input'));
+        productNameInput.dispatchEvent(new Event('input'));
+        productDescInput.dispatchEvent(new Event('input'));
+        productQtyInput.dispatchEvent(new Event('input'));
+        productPriceInput.dispatchEvent(new Event('input'));
+        productTotalInput.dispatchEvent(new Event('input'));
+        currencySelect.dispatchEvent(new Event('change'));
+        invoiceTypeSelect.dispatchEvent(new Event('change'));
+        invoiceNumberMainInput.dispatchEvent(new Event('input'));
+        langSelect.dispatchEvent(new Event('change'));
+    });
+
+    document.getElementById('pdfBtn').addEventListener('click', function() {
+        window.print();
+    });
+    </script>
+</body>
+</html>
